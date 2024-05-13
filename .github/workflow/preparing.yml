@@ -1,0 +1,54 @@
+name: Preparing app to delpoy
+on:
+  push:
+    branches:
+      - master
+jobs:
+  test_app:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the rep code
+        uses: actions/checkout@v4
+      - name: Chache modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependences
+        run: npm ci
+      - name: Test app
+        run: npm run test
+  lint:
+    runs-on: ubuntu-latest
+    needs: test_app
+    steps:
+      - name: Get the rep code
+        uses: actions/checkout@v4
+      - name: Chache modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependences
+        run: npm ci
+      - name: Lint app
+        run: npm run lint
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, test_app]
+    steps:
+      - name: Get the rep code
+        uses: actions/checkout@v4
+      - name: Node.js installing
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{matrix.node-version}}
+      - name: Chache modules of the project
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+      - name: Install dependences
+        run: npm ci
+      - name: Build app
+        run: npm run build
