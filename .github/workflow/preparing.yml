@@ -1,4 +1,4 @@
-name: Preparing app to delpoy
+name: Preparing app to delpoy!
 on:
   push:
     branches:
